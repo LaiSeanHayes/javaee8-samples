@@ -2,9 +2,11 @@ package org.javaee8.cdi.dynamic.bean;
 
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import javax.inject.Inject;
 
+import org.hamcrest.Matchers;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -13,13 +15,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * 
+ *
  * @author Arjan Tijms
  *
  */
 @RunWith(Arquillian.class)
 public class DynamicBeanTest {
-    
+
     @Deployment
     public static WebArchive deploy() {
         return create(WebArchive.class)
@@ -27,7 +29,7 @@ public class DynamicBeanTest {
                     create(JavaArchive.class)
                         .addClasses(CdiExtension.class, MyBean.class, MyBeanImpl.class)
                         .addAsResource("META-INF/services/javax.enterprise.inject.spi.Extension"))
-                .addAsManifestResource("beans.xml");
+                .addAsWebInfResource("beans.xml");
     }
 
     @Inject
@@ -35,6 +37,7 @@ public class DynamicBeanTest {
 
     @Test
     public void test() {
+        assertThat("myBean", myBean, Matchers.notNullValue());
         assertEquals("Hi!", myBean.sayHi());
     }
 }
